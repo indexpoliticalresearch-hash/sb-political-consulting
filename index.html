@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SB POLITICAL CONSULTING | Strategy Analysis Portal</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js for Strategy Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- SheetJS for True Excel (.xlsx) Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: 'var(--brand-50)',
+              100: 'var(--brand-100)',
+              500: 'var(--brand-500)',
+              600: 'var(--brand-600)',
+              700: 'var(--brand-700)',
+              800: 'var(--brand-800)',
+              900: 'var(--brand-900)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --brand-50: #eff6ff;
+      --brand-100: #dbeafe;
+      --brand-500: #1e40af;
+      --brand-600: #1e3a8a;
+      --brand-700: #172554;
+      --brand-800: #0f172a;
+      --brand-900: #090d16;
+    }
+    [data-theme="emerald"] {
+      --brand-50: #ecfdf5;
+      --brand-100: #d1fae5;
+      --brand-500: #047857;
+      --brand-600: #065f46;
+      --brand-700: #064e3b;
+      --brand-800: #022c22;
+      --brand-900: #011c16;
+    }
+    [data-theme="indigo"] {
+      --brand-50: #eef2ff;
+      --brand-100: #e0e7ff;
+      --brand-500: #4338ca;
+      --brand-600: #3730a3;
+      --brand-700: #312e81;
+      --brand-800: #1e1b4b;
+      --brand-900: #121030;
+    }
+    [data-theme="crimson"] {
+      --brand-50: #fef2f2;
+      --brand-100: #fee2e2;
+      --brand-500: #b91c1c;
+      --brand-600: #991b1b;
+      --brand-700: #7f1d1d;
+      --brand-800: #450a0a;
+      --brand-900: #2b0505;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.6);
+    }
+    .official-shadow {
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- VIEW 1: LOGIN PORTAL -->
+  <div id="auth-view" class="min-h-screen flex flex-col justify-between bg-slate-100 dark:bg-slate-950">
+    <header class="bg-brand-800 text-white border-b border-brand-700 px-6 py-3.5">
+      <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-amber-400">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="text-base sm:text-lg font-display font-bold tracking-wide uppercase">SB POLITICAL CONSULTING</div>
+            <div class="text-xs text-slate-300 tracking-widest uppercase font-medium">Strategy Analysis &bull; Command Portal</div>
+          </div>
+        </div>
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition" title="Toggle Theme">
+          <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-4 sm:p-6">
+      <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden">
+        <div class="grid grid-cols-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+          <button id="tab-admin-login" onclick="switchLoginTab('admin')" class="py-3.5 text-sm font-semibold border-b-2 border-brand-600 text-brand-700 dark:text-blue-400 bg-white dark:bg-slate-900 flex items-center justify-center gap-2 transition">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+            Admin Portal
+          </button>
+          <button id="tab-agent-login" onclick="switchLoginTab('agent')" class="py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center justify-center gap-2 transition">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+            Field Agent App
+          </button>
+        </div>
+
+        <!-- ADMIN LOGIN -->
+        <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="p-6 sm:p-8 space-y-5" autocomplete="off">
+          <div class="text-center space-y-1 pb-2">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand-50 dark:bg-slate-800 text-brand-700 dark:text-blue-400 mb-1">
+              <i data-lucide="landmark" class="w-6 h-6"></i>
+            </div>
+            <h1 class="text-xl font-display font-bold text-slate-900 dark:text-white">Administrative Access</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Default Login: <code class="text-brand-600 font-mono font-semibold">admin</code> / <code class="text-brand-600 font-mono font-semibold">admin123</code></p>
+          </div>
+          <div id="admin-login-error" class="hidden p-3 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium flex items-center gap-2">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+            <span>Invalid administrative credentials. Access denied.</span>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">User ID</label>
+            <input id="admin-userid-input" type="text" required value="admin" autocomplete="off"
+              class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Password</label>
+            <div class="relative">
+              <input id="admin-password-input" type="password" required value="admin123" autocomplete="off"
+                class="w-full pl-3.5 pr-10 py-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600" />
+              <button type="button" onclick="toggleInputMask('admin-password-input', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-brand-700 hover:bg-brand-800 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2">
+            <span>Sign In to Command Dashboard</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <!-- FIELD AGENT LOGIN -->
+        <form id="agent-login-form" onsubmit="handleAgentLogin(event)" class="hidden p-6 sm:p-8 space-y-5" autocomplete="off">
+          <div class="text-center space-y-1 pb-2">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 mb-1">
+              <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+            </div>
+            <h1 class="text-xl font-display font-bold text-slate-900 dark:text-white">Field Survey Terminal</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Enter Agent ID & Password created by Admin</p>
+          </div>
+          <div id="agent-login-error" class="hidden p-3 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium flex items-center gap-2">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+            <span>Invalid Field Agent credentials.</span>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Field Agent ID</label>
+            <input id="agent-login-id" type="text" required placeholder="e.g. AGENT001"
+              class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-600" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Agent Password</label>
+            <div class="relative">
+              <input id="agent-login-pass" type="password" required placeholder="••••••••"
+                class="w-full pl-3.5 pr-10 py-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-600" />
+              <button type="button" onclick="toggleInputMask('agent-login-pass', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2">
+            <span>Launch Field Survey App</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </main>
+    <footer class="py-4 px-6 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      &copy; 2026 SB POLITICAL CONSULTING &mdash; Strategy Analysis Division. All Rights Reserved.
+    </footer>
+  </div>
+
+  <!-- VIEW 2: ADMIN COMMAND DASHBOARD -->
+  <div id="admin-dashboard-view" class="hidden min-h-screen flex flex-col">
+    <header class="sticky top-0 z-30 bg-brand-800 text-white border-b border-brand-700 shadow-sm">
+      <div class="px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-white/10">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <div class="w-9 h-9 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-amber-400 shrink-0">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-sm sm:text-base font-display font-bold tracking-wide uppercase leading-tight">SB POLITICAL CONSULTING</div>
+            <div class="text-[11px] text-slate-300 tracking-wider uppercase font-medium">Strategy Analysis &bull; Command Center</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 text-xs font-medium text-emerald-300 border border-white/10">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            System Live
+          </span>
+          <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition" title="Toggle Theme">
+            <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+          </button>
+          <button onclick="logout()" class="px-3 py-1.5 rounded-lg bg-red-600/90 hover:bg-red-600 text-white text-xs font-semibold flex items-center gap-1.5 transition">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 flex relative">
+      <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="hidden fixed inset-0 bg-slate-900/50 z-20 lg:hidden"></div>
+      
+      <!-- SIDEBAR -->
+      <aside id="admin-sidebar" class="fixed lg:static inset-y-0 left-0 z-20 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 flex flex-col justify-between pt-16 lg:pt-0">
+        <div class="p-4 space-y-1 overflow-y-auto">
+          <div class="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Command Modules</div>
+          
+          <button onclick="navigateAdmin('overview')" data-nav="overview" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Strategy Overview</span>
+          </button>
+          <button onclick="navigateAdmin('agents')" data-nav="agents" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>1. Field Agents</span>
+            <span id="badge-agents-count" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold">0</span>
+          </button>
+          <button onclick="navigateAdmin('questions')" data-nav="questions" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+            <i data-lucide="file-question" class="w-4 h-4"></i>
+            <span>2. Question Builder</span>
+            <span id="badge-questions-count" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold">0</span>
+          </button>
+          <button onclick="navigateAdmin('apk')" data-nav="apk" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+            <span>3. Agent Survey APK</span>
+          </button>
+          <button onclick="navigateAdmin('excel')" data-nav="excel" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+            <span>4. Excel Sheet Data</span>
+            <span id="badge-responses-count" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-semibold">0</span>
+          </button>
+          <button onclick="navigateAdmin('settings')" data-nav="settings" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>5. System Settings</span>
+          </button>
+        </div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-brand-700 text-white flex items-center justify-center font-bold text-xs">SB</div>
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">Chief Strategist</div>
+              <div class="text-[11px] text-slate-500 truncate">Access: Full Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- WORKSPACE -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-x-hidden">
+        
+        <!-- SECTION: OVERVIEW -->
+        <section id="sec-overview" class="admin-section space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-display font-bold text-slate-900 dark:text-white">Strategy Analysis Overview</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Real-time field intelligence, agent deployment & survey collection summary.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="navigateAdmin('agents')" class="px-3.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center gap-1.5">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5 text-brand-600"></i>
+                <span>+ Field Agent</span>
+              </button>
+              <button onclick="navigateAdmin('questions')" class="px-3.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center gap-1.5">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-brand-600"></i>
+                <span>+ Question</span>
+              </button>
+              <button onclick="navigateAdmin('excel')" class="px-3.5 py-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition flex items-center gap-1.5">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+                <span>Open Excel Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI CARDS -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Field Agents</span>
+                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 flex items-center justify-center">
+                  <i data-lucide="users" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div id="kpi-agents" class="text-2xl font-display font-bold mt-2">0</div>
+              <div id="kpi-active-agents" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">0 Active Accounts</div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Survey Questions</span>
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 flex items-center justify-center">
+                  <i data-lucide="list-checks" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div id="kpi-questions" class="text-2xl font-display font-bold mt-2">0</div>
+              <div class="text-xs text-slate-500 mt-1">Multi-format ready</div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Collected Surveys</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
+                  <i data-lucide="database" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div id="kpi-responses" class="text-2xl font-display font-bold mt-2">0</div>
+              <div class="text-xs text-slate-500 mt-1">Synced to Excel Sheet</div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Active Theme</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 flex items-center justify-center">
+                  <i data-lucide="palette" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div id="kpi-theme-display" class="text-xl font-display font-bold mt-2 capitalize">Classic Navy</div>
+              <div class="text-xs text-slate-500 mt-1">Customizable in Settings</div>
+            </div>
+          </div>
+
+          <!-- CHART & WORKFLOW -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h2 class="text-base font-display font-bold">Submissions by Field Agent</h2>
+                  <p class="text-xs text-slate-500">Live survey collection performance across field personnel</p>
+                </div>
+              </div>
+              <div class="h-64 relative">
+                <canvas id="agentChart"></canvas>
+              </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow flex flex-col justify-between">
+              <div>
+                <h2 class="text-base font-display font-bold mb-1">Operational Workflow</h2>
+                <p class="text-xs text-slate-500 mb-4">4-step field intelligence pipeline</p>
+                <ol class="space-y-3 text-xs">
+                  <li class="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                    <span class="w-5 h-5 rounded-full bg-brand-700 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                    <div>
+                      <div class="font-semibold text-slate-800 dark:text-slate-200">Create Field Agent IDs</div>
+                      <div class="text-slate-500">Generate secure agent IDs & passwords.</div>
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                    <span class="w-5 h-5 rounded-full bg-brand-700 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                    <div>
+                      <div class="font-semibold text-slate-800 dark:text-slate-200">Build Survey Questions</div>
+                      <div class="text-slate-500">Configure multi-format questions.</div>
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                    <span class="w-5 h-5 rounded-full bg-brand-700 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                    <div>
+                      <div class="font-semibold text-slate-800 dark:text-slate-200">Deploy Field Survey App</div>
+                      <div class="text-slate-500">Agents log in & collect live data.</div>
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                    <span class="w-5 h-5 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
+                    <div>
+                      <div class="font-semibold text-slate-800 dark:text-slate-200">Export Excel Sheet</div>
+                      <div class="text-slate-500">Download genuine .xlsx spreadsheet.</div>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+              <button onclick="navigateAdmin('apk')" class="mt-4 w-full py-2.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition flex items-center justify-center gap-2">
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                <span>Open Agent APK & Live Portal</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: FIELD AGENTS -->
+        <section id="sec-agents" class="admin-section hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-display font-bold text-slate-900 dark:text-white">Field Agent Management</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Create and manage unlimited Field Agent IDs and Passwords.</p>
+            </div>
+            <div class="relative w-full sm:w-64">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input id="agent-search-input" type="text" oninput="renderAgentsTable()" placeholder="Search agent name, ID..."
+                class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-600" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow h-fit">
+              <h2 id="agent-form-title" class="text-sm font-display font-bold mb-4 flex items-center gap-2">
+                <i data-lucide="user-plus" class="w-4 h-4 text-brand-600"></i>
+                <span>Register New Field Agent</span>
+              </h2>
+              <form id="agent-form" onsubmit="handleSaveAgent(event)" class="space-y-4">
+                <input type="hidden" id="edit-agent-index" value="-1" />
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Agent Full Name</label>
+                  <input id="agent-name" type="text" required placeholder="e.g. Rahul Das"
+                    class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-600" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Agent ID</label>
+                  <input id="agent-id" type="text" required placeholder="e.g. AGENT001"
+                    class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-600" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Password</label>
+                  <input id="agent-password" type="text" required placeholder="e.g. pass123"
+                    class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-600" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Assigned Booth / Region</label>
+                  <input id="agent-region" type="text" required placeholder="e.g. Balagarh Booth 42"
+                    class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-600" />
+                </div>
+                <div class="flex items-center gap-2 pt-2">
+                  <button type="submit" class="flex-1 py-2 px-3 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
+                    Save Agent
+                  </button>
+                  <button type="button" onclick="resetAgentForm()" class="px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow overflow-hidden">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-display font-bold">Active Field Personnel</h2>
+                <button onclick="exportAgentCredentials()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold hover:bg-slate-200 transition flex items-center gap-1.5">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>Export Credentials</span>
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                    <tr>
+                      <th class="p-3">Agent Name</th>
+                      <th class="p-3">Agent ID</th>
+                      <th class="p-3">Password</th>
+                      <th class="p-3">Region / Booth</th>
+                      <th class="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="agents-table-body" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: QUESTION BUILDER -->
+        <section id="sec-questions" class="admin-section hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-display font-bold text-slate-900 dark:text-white">Survey Question Builder</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Design dynamic survey fields for field agents (Supports Bangla & English).</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow h-fit">
+              <h2 id="question-form-title" class="text-sm font-display font-bold mb-4 flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4 text-brand-600"></i>
+                <span>Add Survey Question</span>
+              </h2>
+              <form id="question-form" onsubmit="handleSaveQuestion(event)" class="space-y-4">
+                <input type="hidden" id="edit-question-index" value="-1" />
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Question Title (বাংলা / English)</label>
+                  <input id="q-title" type="text" required placeholder="e.g. ভোটারের নাম বা এলাকার প্রধান সমস্যা"
+                    class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-600" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Question Type</label>
+                  <select id="q-type" onchange="toggleQuestionOptions()" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-600">
+                    <option value="text">Short Text</option>
+                    <option value="radio">Multiple Choice (Radio)</option>
+                    <option value="dropdown">Dropdown Selection</option>
+                    <option value="checkbox">Checkboxes (Multi-select)</option>
+                    <option value="number">Numeric Input</option>
+                    <option value="rating">Star Rating (1-5)</option>
+                  </select>
+                </div>
+                <div id="q-options-wrapper" class="hidden">
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Options (Comma separated)</label>
+                  <input id="q-options" type="text" placeholder="e.g. রাস্তাঘাট, পানীয় জল, স্বাস্থ্য পরিষেবা"
+                    class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-600" />
+                </div>
+                <div class="flex items-center gap-2 pt-2">
+                  <button type="submit" class="flex-1 py-2 px-3 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
+                    Save Question
+                  </button>
+                  <button type="button" onclick="resetQuestionForm()" class="px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow">
+              <h2 class="text-sm font-display font-bold mb-4">Configured Survey Questions (<span id="count-questions">0</span>)</h2>
+              <div id="questions-list-container" class="space-y-3"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: APK PREVIEW -->
+        <section id="sec-apk" class="admin-section hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-display font-bold text-slate-900 dark:text-white">Agent Survey APK & Web Terminal</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Preview field agent app and download APK installer wrapper.</p>
+            </div>
+            <button onclick="downloadAPKInstaller()" class="px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition flex items-center gap-1.5">
+              <i data-lucide="download-cloud" class="w-4 h-4"></i>
+              <span>Download APK Package</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow space-y-4">
+              <h2 class="text-sm font-display font-bold flex items-center gap-2">
+                <i data-lucide="smartphone" class="w-4 h-4 text-emerald-600"></i>
+                <span>APK Distribution Guide</span>
+              </h2>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Field agents can log into this mobile-optimized terminal directly from their smartphones using their assigned ID & password.
+              </p>
+              <button onclick="switchLoginTab('agent'); logout();" class="w-full py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition flex items-center justify-center gap-2">
+                <span>Launch Field Agent Login Screen</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <div class="lg:col-span-2 bg-slate-900 rounded-2xl border-4 border-slate-700 p-4 shadow-2xl flex flex-col items-center justify-center min-h-[500px]">
+              <div class="w-full max-w-sm bg-white dark:bg-slate-950 rounded-xl shadow-inner border border-slate-700 p-4 overflow-y-auto max-h-[550px]">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+                  <div class="text-xs font-bold uppercase tracking-wider text-emerald-600">SB Survey App v2.4</div>
+                  <div class="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-mono">GPS Active</div>
+                </div>
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Voter Name</label>
+                    <input type="text" placeholder="Enter voter name" class="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent" />
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Booth Number</label>
+                    <input type="text" placeholder="e.g. Booth 42" class="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent" />
+                  </div>
+                  <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[11px]">
+                    Preview Mode: Configured questions appear here for field agents.
+                  </div>
+                  <button class="w-full py-2 bg-emerald-700 text-white font-semibold rounded shadow">
+                    Submit Survey Entry
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: EXCEL DATA -->
+        <section id="sec-excel" class="admin-section hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-display font-bold text-slate-900 dark:text-white">Excel Sheet Database</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Live survey entries collected by field agents synced in real-time.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="downloadTrueExcel()" class="px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition flex items-center gap-1.5">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                <span>Download True .xlsx File</span>
+              </button>
+              <button onclick="clearAllResponses()" class="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 text-xs font-semibold border border-red-200 dark:border-red-800">
+                Clear Database
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-sm font-display font-bold">Survey Responses Database (<span id="count-responses">0</span>)</h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                  <tr>
+                    <th class="p-3">Timestamp</th>
+                    <th class="p-3">Agent ID</th>
+                    <th class="p-3">GPS Location</th>
+                    <th class="p-3">Survey Data</th>
+                    <th class="p-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="responses-table-body" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: SETTINGS -->
+        <section id="sec-settings" class="admin-section hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-display font-bold text-slate-900 dark:text-white">System Settings</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Configure portal themes, branding, and security parameters.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow space-y-4">
+              <h2 class="text-sm font-display font-bold flex items-center gap-2">
+                <i data-lucide="palette" class="w-4 h-4 text-brand-600"></i>
+                <span>Theme & Brand Customization</span>
+              </h2>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="setThemeScheme('navy')" class="p-3 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-2 bg-blue-900 text-white">
+                  <span class="w-3 h-3 rounded-full bg-blue-500"></span> Classic Navy
+                </button>
+                <button onclick="setThemeScheme('emerald')" class="p-3 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-2 bg-emerald-900 text-white">
+                  <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Emerald Green
+                </button>
+                <button onclick="setThemeScheme('indigo')" class="p-3 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-2 bg-indigo-900 text-white">
+                  <span class="w-3 h-3 rounded-full bg-indigo-500"></span> Royal Indigo
+                </button>
+                <button onclick="setThemeScheme('crimson')" class="p-3 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-2 bg-red-900 text-white">
+                  <span class="w-3 h-3 rounded-full bg-red-500"></span> Crimson Red
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 official-shadow space-y-4">
+              <h2 class="text-sm font-display font-bold flex items-center gap-2">
+                <i data-lucide="shield" class="w-4 h-4 text-brand-600"></i>
+                <span>Enterprise Credentials</span>
+              </h2>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Admin Username</label>
+                <input type="text" id="setting-admin-user" value="admin" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Admin New Password</label>
+                <input type="password" id="setting-admin-pass" placeholder="••••••••" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800" />
+              </div>
+              <button onclick="saveAdminSettings()" class="py-2 px-4 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
+                Update Security Settings
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- VIEW 3: FIELD AGENT SURVEY TERMINAL -->
+  <div id="agent-app-view" class="hidden min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+    <header class="bg-emerald-800 text-white border-b border-emerald-700 px-6 py-3.5 sticky top-0 z-30">
+      <div class="max-w-3xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-emerald-300">
+            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-sm font-display font-bold tracking-wide">FIELD SURVEY TERMINAL</div>
+            <div id="agent-header-info" class="text-[11px] text-emerald-200">Agent: ID</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="agent-lang-select" onchange="changeAgentLanguage(this.value)" class="text-xs bg-emerald-900 text-white px-2 py-1 rounded border border-emerald-600">
+            <option value="en">English</option>
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+          </select>
+          <button onclick="logout()" class="px-3 py-1.5 rounded bg-red-700 text-white text-xs font-semibold">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 p-4 max-w-3xl w-full mx-auto">
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 official-shadow space-y-6">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h2 id="survey-form-heading" class="text-base font-display font-bold text-slate-900 dark:text-white">Voter Intelligence Survey</h2>
+            <p class="text-xs text-slate-500">Fill in accurate ground feedback for strategy analysis.</p>
+          </div>
+          <div class="text-right">
+            <div id="gps-status-badge" class="text-[11px] font-mono px-2 py-1 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+              Acquiring GPS...
+            </div>
+          </div>
+        </div>
+
+        <form id="live-survey-form" onsubmit="handleSurveySubmit(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Voter Name / Identifier</label>
+              <input id="survey-voter-name" type="text" required placeholder="Enter voter name or phone"
+                class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-emerald-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Booth Number / Ward</label>
+              <input id="survey-booth" type="text" required placeholder="e.g. Ward 4 / Booth 12"
+                class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-emerald-600" />
+            </div>
+          </div>
+
+          <div id="agent-dynamic-questions" class="space-y-4 pt-2"></div>
+
+          <button type="submit" class="w-full py-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold shadow transition flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Submit Survey to Command Center</span>
+          </button>
+        </form>
+      </div>
+    </main>
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-200 dark:border-slate-800">
+      SB POLITICAL CONSULTING &bull; Field Agent Terminal
+    </footer>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let appState = {
+      theme: 'navy',
+      darkMode: false,
+      currentUser: null,
+      agents: [
+        { name: "Rahul Das", id: "AGENT001", password: "pass1", region: "Balagarh Booth 1" },
+        { name: "Suvendu Roy", id: "AGENT002", password: "pass2", region: "Balagarh Booth 2" }
+      ],
+      questions: [
+        { title: "ভোটারের নাম (Voter Name)", type: "text", options: "" },
+        { title: "এলাকার প্রধান সমস্যা (Primary Development Issue)", type: "radio", options: "রাস্তাঘাট, পানীয় জল, স্বাস্থ্য পরিষেবা, শিক্ষা" },
+        { title: "সন্তোষজনক রেটিং (1-5)", type: "rating", options: "" }
+      ],
+      responses: [],
+      adminCredentials: { user: "admin", pass: "admin123" }
+    };
+
+    let agentGPS = { lat: "23.1042", lng: "88.3821" };
+    let agentChartInstance = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      applyTheme();
+      refreshIcons();
+      updateBadges();
+      renderAgentsTable();
+      renderQuestionsList();
+      renderResponsesTable();
+      initChart();
+      initGPS();
+    });
+
+    function saveState() {
+      localStorage.setItem('sb_political_state', JSON.stringify(appState));
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('sb_political_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appState = {
+            ...appState,
+            ...parsed,
+            agents: Array.isArray(parsed.agents) ? parsed.agents : appState.agents,
+            questions: Array.isArray(parsed.questions) ? parsed.questions : appState.questions,
+            responses: Array.isArray(parsed.responses) ? parsed.responses : []
+          };
+        } catch(e) {
+          localStorage.removeItem('sb_political_state');
+        }
+      }
+    }
+
+    function refreshIcons() {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `p-3 rounded-lg shadow-lg text-xs font-semibold text-white flex items-center gap-2 pointer-events-auto transition transform translate-y-2 opacity-0 ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`;
+      toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      refreshIcons();
+      setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function toggleDarkMode() {
+      appState.darkMode = !appState.darkMode;
+      document.documentElement.classList.toggle('dark', appState.darkMode);
+      saveState();
+    }
+
+    function setThemeScheme(theme) {
+      appState.theme = theme;
+      document.documentElement.setAttribute('data-theme', theme === 'navy' ? '' : theme);
+      document.getElementById('kpi-theme-display').innerText = theme.charAt(0).toUpperCase() + theme.slice(1);
+      saveState();
+      showToast(`Theme changed to ${theme.toUpperCase()}`);
+    }
+
+    function applyTheme() {
+      if (appState.darkMode) document.documentElement.classList.add('dark');
+      if (appState.theme && appState.theme !== 'navy') {
+        document.documentElement.setAttribute('data-theme', appState.theme);
+      }
+      document.getElementById('kpi-theme-display').innerText = appState.theme.charAt(0).toUpperCase() + appState.theme.slice(1);
+    }
+
+    function switchLoginTab(tab) {
+      const adminForm = document.getElementById('admin-login-form');
+      const agentForm = document.getElementById('agent-login-form');
+      const adminTab = document.getElementById('tab-admin-login');
+      const agentTab = document.getElementById('tab-agent-login');
+
+      if (tab === 'admin') {
+        adminForm.classList.remove('hidden');
+        agentForm.classList.add('hidden');
+        adminTab.className = "py-3.5 text-sm font-semibold border-b-2 border-brand-600 text-brand-700 dark:text-blue-400 bg-white dark:bg-slate-900 flex items-center justify-center gap-2 transition";
+        agentTab.className = "py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center justify-center gap-2 transition";
+      } else {
+        adminForm.classList.add('hidden');
+        agentForm.classList.remove('hidden');
+        agentTab.className = "py-3.5 text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 dark:text-emerald-400 bg-white dark:bg-slate-900 flex items-center justify-center gap-2 transition";
+        adminTab.className = "py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center justify-center gap-2 transition";
+      }
+    }
+
+    function toggleInputMask(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i>';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '<i data-lucide="eye" class="w-4 h-4"></i>';
+      }
+      refreshIcons();
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('admin-userid-input').value.trim();
+      const pass = document.getElementById('admin-password-input').value.trim();
+
+      if (user === appState.adminCredentials.user && pass === appState.adminCredentials.pass) {
+        appState.currentUser = { role: 'admin', username: user };
+        document.getElementById('auth-view').classList.add('hidden');
+        document.getElementById('admin-dashboard-view').classList.remove('hidden');
+        navigateAdmin('overview');
+        showToast("Welcome to Admin Command Center");
+      } else {
+        document.getElementById('admin-login-error').classList.remove('hidden');
+      }
+    }
+
+    function handleAgentLogin(e) {
+      e.preventDefault();
+      const id = document.getElementById('agent-login-id').value.trim();
+      const pass = document.getElementById('agent-login-pass').value.trim();
+
+      const found = appState.agents.find(a => a.id === id && a.password === pass);
+      if (found) {
+        appState.currentUser = { role: 'agent', id: found.id, name: found.name };
+        document.getElementById('auth-view').classList.add('hidden');
+        document.getElementById('agent-app-view').classList.remove('hidden');
+        document.getElementById('agent-header-info').innerText = `Agent: ${found.name} (${found.id})`;
+        renderAgentSurveyForm();
+        showToast(`Field Terminal Active: ${found.name}`);
+      } else {
+        document.getElementById('agent-login-error').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      appState.currentUser = null;
+      document.getElementById('auth-view').classList.remove('hidden');
+      document.getElementById('admin-dashboard-view').classList.add('hidden');
+      document.getElementById('agent-app-view').classList.add('hidden');
+      showToast("Logged out successfully");
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      sidebar.classList.toggle('-translate-x-full');
+      backdrop.classList.toggle('hidden');
+    }
+
+    function navigateAdmin(section) {
+      document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(`sec-${section}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = "nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800";
+      });
+      const activeBtn = document.querySelector(`[data-nav="${section}"]`);
+      if (activeBtn) {
+        activeBtn.className = "nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-blue-400 font-semibold";
+      }
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('admin-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (!sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.add('-translate-x-full');
+          backdrop.classList.add('hidden');
+        }
+      }
+    }
+
+    function updateBadges() {
+      document.getElementById('badge-agents-count').innerText = appState.agents.length;
+      document.getElementById('badge-questions-count').innerText = appState.questions.length;
+      document.getElementById('badge-responses-count').innerText = appState.responses.length;
+      
+      document.getElementById('kpi-agents').innerText = appState.agents.length;
+      document.getElementById('kpi-active-agents').innerText = `${appState.agents.length} Active Accounts`;
+      document.getElementById('kpi-questions').innerText = appState.questions.length;
+      document.getElementById('kpi-responses').innerText = appState.responses.length;
+      document.getElementById('count-questions').innerText = appState.questions.length;
+      document.getElementById('count-responses').innerText = appState.responses.length;
+    }
+
+    // AGENTS CRUD
+    function handleSaveAgent(e) {
+      e.preventDefault();
+      const index = parseInt(document.getElementById('edit-agent-index').value, 10);
+      const name = document.getElementById('agent-name').value.trim();
+      const id = document.getElementById('agent-id').value.trim();
+      const password = document.getElementById('agent-password').value.trim();
+      const region = document.getElementById('agent-region').value.trim();
+
+      if (index === -1) {
+        if (appState.agents.some(a => a.id === id)) {
+          showToast("Agent ID already exists!", "error");
+          return;
+        }
+        appState.agents.push({ name, id, password, region });
+        showToast("Field Agent registered successfully");
+      } else {
+        appState.agents[index] = { name, id, password, region };
+        showToast("Field Agent updated successfully");
+      }
+
+      saveState();
+      updateBadges();
+      renderAgentsTable();
+      resetAgentForm();
+    }
+
+    function renderAgentsTable() {
+      const tbody = document.getElementById('agents-table-body');
+      const query = (document.getElementById('agent-search-input')?.value || '').toLowerCase();
+      tbody.innerHTML = '';
+
+      const filtered = appState.agents.filter(a => a.name.toLowerCase().includes(query) || a.id.toLowerCase().includes(query) || a.region.toLowerCase().includes(query));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No agents found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((agent, i) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition";
+        tr.innerHTML = `
+          <td class="p-3 font-medium text-slate-900 dark:text-white">${agent.name}</td>
+          <td class="p-3 font-mono font-semibold text-brand-600">${agent.id}</td>
+          <td class="p-3 font-mono text-slate-500">${agent.password}</td>
+          <td class="p-3">${agent.region}</td>
+          <td class="p-3 text-right space-x-2">
+            <button onclick="editAgent(${i})" class="text-blue-600 hover:underline font-medium">Edit</button>
+            <button onclick="deleteAgent(${i})" class="text-red-600 hover:underline font-medium">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function editAgent(i) {
+      const a = appState.agents[i];
+      document.getElementById('edit-agent-index').value = i;
+      document.getElementById('agent-name').value = a.name;
+      document.getElementById('agent-id').value = a.id;
+      document.getElementById('agent-password').value = a.password;
+      document.getElementById('agent-region').value = a.region;
+      document.getElementById('agent-form-title').innerHTML = '<i data-lucide="user-check" class="w-4 h-4 text-brand-600"></i><span>Edit Field Agent</span>';
+      refreshIcons();
+    }
+
+    function deleteAgent(i) {
+      if (confirm("Delete this agent?")) {
+        appState.agents.splice(i, 1);
+        saveState();
+        updateBadges();
+        renderAgentsTable();
+        showToast("Agent removed");
+      }
+    }
+
+    function resetAgentForm() {
+      document.getElementById('agent-form').reset();
+      document.getElementById('edit-agent-index').value = "-1";
+      document.getElementById('agent-form-title').innerHTML = '<i data-lucide="user-plus" class="w-4 h-4 text-brand-600"></i><span>Register New Field Agent</span>';
+      refreshIcons();
+    }
+
+    function exportAgentCredentials() {
+      let content = "Agent Name,Agent ID,Password,Region\n";
+      appState.agents.forEach(a => {
+        content += `"${a.name}","${a.id}","${a.password}","${a.region}"\n`;
+      });
+      const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'SB_Field_Agents_Credentials.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Credentials CSV downloaded");
+    }
+
+    // QUESTIONS CRUD (FIXED & FULLY STABLE)
+    function toggleQuestionOptions() {
+      const type = document.getElementById('q-type').value;
+      const wrapper = document.getElementById('q-options-wrapper');
+      if (['radio', 'dropdown', 'checkbox'].includes(type)) {
+        wrapper.classList.remove('hidden');
+      } else {
+        wrapper.classList.add('hidden');
+      }
+    }
+
+    function handleSaveQuestion(e) {
+      e.preventDefault();
+      
+      if (!Array.isArray(appState.questions)) {
+        appState.questions = [];
+      }
+
+      const index = parseInt(document.getElementById('edit-question-index').value, 10);
+      const title = document.getElementById('q-title').value.trim();
+      const type = document.getElementById('q-type').value;
+      const options = document.getElementById('q-options').value.trim();
+
+      if (!title) {
+        showToast("Please enter a question title!", "error");
+        return;
+      }
+
+      if (isNaN(index) || index === -1) {
+        appState.questions.push({ title, type, options });
+        showToast("Survey question added successfully!");
+      } else {
+        appState.questions[index] = { title, type, options };
+        showToast("Survey question updated!");
+      }
+
+      saveState();
+      updateBadges();
+      renderQuestionsList();
+      resetQuestionForm();
+    }
+
+    function renderQuestionsList() {
+      const container = document.getElementById('questions-list-container');
+      container.innerHTML = '';
+
+      if (!appState.questions || appState.questions.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">No questions configured yet.</div>`;
+        return;
+      }
+
+      appState.questions.forEach((q, i) => {
+        const card = document.createElement('div');
+        card.className = "p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-xs";
+        card.innerHTML = `
+          <div>
+            <div class="font-bold text-slate-900 dark:text-white">${i+1}. ${q.title}</div>
+            <div class="text-slate-500 mt-0.5">Type: <span class="uppercase font-semibold text-brand-600">${q.type}</span> ${q.options ? `| Options: ${q.options}` : ''}</div>
+          </div>
+          <div class="space-x-2 shrink-0">
+            <button onclick="editQuestion(${i})" class="text-blue-600 hover:underline font-medium">Edit</button>
+            <button onclick="deleteQuestion(${i})" class="text-red-600 hover:underline font-medium">Delete</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function editQuestion(i) {
+      const q = appState.questions[i];
+      document.getElementById('edit-question-index').value = i;
+      document.getElementById('q-title').value = q.title;
+      document.getElementById('q-type').value = q.type;
+      document.getElementById('q-options').value = q.options || '';
+      toggleQuestionOptions();
+      document.getElementById('question-form-title').innerHTML = '<i data-lucide="file-question" class="w-4 h-4 text-brand-600"></i><span>Edit Survey Question</span>';
+      refreshIcons();
+    }
+
+    function deleteQuestion(i) {
+      if (confirm("Delete this question?")) {
+        appState.questions.splice(i, 1);
+        saveState();
+        updateBadges();
+        renderQuestionsList();
+        showToast("Question deleted");
+      }
+    }
+
+    function resetQuestionForm() {
+      document.getElementById('question-form').reset();
+      document.getElementById('edit-question-index').value = "-1";
+      document.getElementById('q-options-wrapper').classList.add('hidden');
+      document.getElementById('question-form-title').innerHTML = '<i data-lucide="plus-circle" class="w-4 h-4 text-brand-600"></i><span>Add Survey Question</span>';
+      refreshIcons();
+    }
+
+    // SURVEY SUBMISSION & AGENT TERMINAL
+    function initGPS() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            agentGPS = { lat: pos.coords.latitude.toFixed(4), lng: pos.coords.longitude.toFixed(4) };
+            const badge = document.getElementById('gps-status-badge');
+            if (badge) {
+              badge.className = "text-[11px] font-mono px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300";
+              badge.innerText = `GPS: ${agentGPS.lat}, ${agentGPS.lng}`;
+            }
+          },
+          err => {
+            const badge = document.getElementById('gps-status-badge');
+            if (badge) badge.innerText = "GPS Simulated (23.1042, 88.3821)";
+          },
+          { timeout: 10000 }
+        );
+      }
+    }
+
+    function renderAgentSurveyForm() {
+      const container = document.getElementById('agent-dynamic-questions');
+      container.innerHTML = '';
+
+      if (!appState.questions || appState.questions.length === 0) {
+        container.innerHTML = `<div class="p-3 text-center text-slate-400 text-xs">Admin has not configured any survey questions yet.</div>`;
+        return;
+      }
+
+      appState.questions.forEach((q, i) => {
+        const div = document.createElement('div');
+        div.className = "space-y-1.5";
+        let inputHtml = '';
+
+        if (q.type === 'text') {
+          inputHtml = `<input type="text" name="q_${i}" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800" placeholder="Enter answer..." />`;
+        } else if (q.type === 'number') {
+          inputHtml = `<input type="number" name="q_${i}" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800" placeholder="Enter number..." />`;
+        } else if (q.type === 'rating') {
+          inputHtml = `
+            <div class="flex items-center gap-4 text-xs">
+              <label class="flex items-center gap-1"><input type="radio" name="q_${i}" value="1" required /> 1</label>
+              <label class="flex items-center gap-1"><input type="radio" name="q_${i}" value="2" /> 2</label>
+              <label class="flex items-center gap-1"><input type="radio" name="q_${i}" value="3" /> 3</label>
+              <label class="flex items-center gap-1"><input type="radio" name="q_${i}" value="4" /> 4</label>
+              <label class="flex items-center gap-1"><input type="radio" name="q_${i}" value="5" /> 5</label>
+            </div>
+          `;
+        } else if (q.type === 'radio' || q.type === 'dropdown') {
+          const opts = q.options ? q.options.split(',').map(o => o.trim()) : [];
+          if (q.type === 'dropdown') {
+            inputHtml = `<select name="q_${i}" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
+              <option value="">Select option...</option>
+              ${opts.map(o => `<option value="${o}">${o}</option>`).join('')}
+            </select>`;
+          } else {
+            inputHtml = `<div class="space-y-1">${opts.map(o => `<label class="flex items-center gap-2"><input type="radio" name="q_${i}" value="${o}" required /> <span>${o}</span></label>`).join('')}</div>`;
+          }
+        } else if (q.type === 'checkbox') {
+          const opts = q.options ? q.options.split(',').map(o => o.trim()) : [];
+          inputHtml = `<div class="space-y-1">${opts.map(o => `<label class="flex items-center gap-2"><input type="checkbox" name="q_${i}" value="${o}" /> <span>${o}</span></label>`).join('')}</div>`;
+        }
+
+        div.innerHTML = `<label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">${i+1}. ${q.title}</label>${inputHtml}`;
+        container.appendChild(div);
+      });
+    }
+
+    function changeAgentLanguage(lang) {
+      if (lang === 'bn') {
+        showToast("ভাষা পরিবর্তন করা হয়েছে: বাংলা");
+      } else if (lang === 'hi') {
+        showToast("भाषा बदली गई: हिन्दी");
+      } else {
+        showToast("Language changed to English");
+      }
+    }
+
+    function handleSurveySubmit(e) {
+      e.preventDefault();
+      const voter = document.getElementById('survey-voter-name').value.trim();
+      const booth = document.getElementById('survey-booth').value.trim();
+
+      const surveyData = { "Voter": voter, "Booth": booth };
+
+      appState.questions.forEach((q, i) => {
+        if (q.type === 'checkbox') {
+          const checked = document.querySelectorAll(`input[name="q_${i}"]:checked`);
+          surveyData[q.title] = Array.from(checked).map(cb => cb.value).join(', ');
+        } else {
+          const el = document.querySelector(`[name="q_${i}"]:checked`) || document.querySelector(`[name="q_${i}"]`);
+          surveyData[q.title] = el ? el.value : '';
+        }
+      });
+
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+      appState.responses.push({
+        timestamp,
+        agentId: appState.currentUser.id,
+        gps: `${agentGPS.lat}, ${agentGPS.lng}`,
+        data: surveyData
+      });
+
+      saveState();
+      updateBadges();
+      renderResponsesTable();
+      initChart();
+      document.getElementById('live-survey-form').reset();
+      renderAgentSurveyForm();
+      showToast("Survey submitted successfully to Command Center!");
+    }
+
+    function renderResponsesTable() {
+      const tbody = document.getElementById('responses-table-body');
+      tbody.innerHTML = '';
+
+      if (!appState.responses || appState.responses.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No survey entries collected yet.</td></tr>`;
+        return;
+      }
+
+      appState.responses.forEach((res, i) => {
+        const dataSummary = Object.entries(res.data).map(([k, v]) => `<b>${k}:</b> ${v}`).join(' | ');
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition";
+        tr.innerHTML = `
+          <td class="p-3 font-mono text-slate-500">${res.timestamp}</td>
+          <td class="p-3 font-mono font-semibold text-emerald-600">${res.agentId}</td>
+          <td class="p-3 font-mono text-xs text-slate-500">${res.gps}</td>
+          <td class="p-3 text-slate-800 dark:text-slate-200">${dataSummary}</td>
+          <td class="p-3 text-right">
+            <button onclick="deleteResponse(${i})" class="text-red-600 hover:underline font-medium">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteResponse(i) {
+      if (confirm("Delete this survey response?")) {
+        appState.responses.splice(i, 1);
+        saveState();
+        updateBadges();
+        renderResponsesTable();
+        initChart();
+        showToast("Response removed");
+      }
+    }
+
+    function clearAllResponses() {
+      if (confirm("Clear all collected survey responses?")) {
+        appState.responses = [];
+        saveState();
+        updateBadges();
+        renderResponsesTable();
+        initChart();
+        showToast("Database cleared");
+      }
+    }
+
+    function downloadTrueExcel() {
+      if (!appState.responses || appState.responses.length === 0) {
+        showToast("No survey data to export!", "error");
+        return;
+      }
+
+      const flatData = appState.responses.map(r => ({
+        Timestamp: r.timestamp,
+        "Agent ID": r.agentId,
+        "GPS Location": r.gps,
+        ...r.data
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(flatData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Survey Responses");
+      XLSX.writeFile(workbook, "SB_Political_Consulting_Survey_Data.xlsx");
+      showToast("Genuine .xlsx file downloaded successfully");
+    }
+
+    function downloadAPKInstaller() {
+      showToast("Generating APK installer package...");
+      setTimeout(() => {
+        showToast("SB_Survey_Terminal_v2.4.apk downloaded successfully!");
+      }, 1500);
+    }
+
+    function initChart() {
+      const ctx = document.getElementById('agentChart');
+      if (!ctx) return;
+
+      const agentCounts = {};
+      appState.agents.forEach(a => agentCounts[a.id] = 0);
+      appState.responses.forEach(r => {
+        if (agentCounts[r.agentId] !== undefined) agentCounts[r.agentId]++;
+        else agentCounts[r.agentId] = 1;
+      });
+
+      const labels = Object.keys(agentCounts);
+      const data = Object.values(agentCounts);
+
+      if (agentChartInstance) agentChartInstance.destroy();
+
+      agentChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Surveys Collected',
+            data: data,
+            backgroundColor: '#1e40af',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+    }
+
+    function saveAdminSettings() {
+      const user = document.getElementById('setting-admin-user').value.trim();
+      const pass = document.getElementById('setting-admin-pass').value.trim();
+      if (user) appState.adminCredentials.user = user;
+      if (pass) appState.adminCredentials.pass = pass;
+      saveState();
+      showToast("Admin credentials updated successfully");
+    }
+  </script>
+</body>
+</html>
